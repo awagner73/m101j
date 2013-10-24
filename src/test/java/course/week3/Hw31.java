@@ -43,22 +43,43 @@ public class Hw31 {
     public void homework() {
         DBCursor cursor = studentsCollection.find();
 
+        int count=0;
         while(cursor.hasNext()) {
+            count++;
             DBObject dbObject = cursor.next();
             BasicDBList scores = (BasicDBList) dbObject.get("scores");
-            while(scores.iterator().hasNext()) {
-                BasicDBObject score = ( BasicDBObject ) scores.iterator().next();
-                    System.out.println(score);
-                /*
-                if(score.get("type").equals("homework")) {
+            System.out.println(dbObject.get("name"));
+
+            double lowerScore = 0.0;
+            int lowerIndex = 0;
+            for(int i=0; i< scores.size();i++) {
+                BasicDBObject score = (BasicDBObject) scores.get(i);
+                String scoreType = score.getString("type");
+
+                if(scoreType.equals("homework")) {
+                    double scoreDouble = score.getDouble("score");
+                    //lowerScore = scoreDouble;
+
+                    if(Math.min(lowerScore, scoreDouble) == scoreDouble || lowerScore == 0.0) {
+                        lowerScore = scoreDouble;
+                        lowerIndex = i;
+                        System.out.println("---"+i+ " - "+ lowerScore +" - "+scoreDouble);
+                    }
                 }
-                */
 
             }
+
+            System.out.println("LOWERSCORE IS:"+ lowerIndex + " " + lowerScore);
+            scores.remove(lowerIndex);
+            studentsCollection.update(new BasicDBObject("_id",dbObject.get("_id")),dbObject);
+
+
+            lowerScore = 0D;
 
 
 
         }
+        System.out.println(count);
 
 
     }
